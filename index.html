@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تست چت Puter.js</title>
+  <script src="https://js.puter.com/v2/"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #0f0f0f;
+      color: #e8e8e8;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 640px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 12px;
+    }
+
+    header {
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      color: #888;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+    }
+
+    header .model-tag {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.7rem;
+      background: #1e1e1e;
+      border: 1px solid #333;
+      color: #666;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    #chat-box {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 4px 2px;
+    }
+
+    #chat-box::-webkit-scrollbar { width: 4px; }
+    #chat-box::-webkit-scrollbar-track { background: transparent; }
+    #chat-box::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+    .msg {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .msg.user {
+      align-self: flex-start;
+      background: #1a1a2e;
+      border: 1px solid #2d2d4e;
+      color: #c8d0ff;
+    }
+
+    .msg.ai {
+      align-self: flex-end;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #e0e0e0;
+    }
+
+    .msg.system {
+      align-self: center;
+      background: transparent;
+      color: #444;
+      font-size: 0.75rem;
+      border: none;
+      padding: 4px 0;
+    }
+
+    .msg.ai.streaming { border-color: #3a3a5a; }
+
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 14px;
+      background: #888;
+      margin-right: 2px;
+      vertical-align: middle;
+      animation: blink 0.8s infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    #user-input {
+      flex: 1;
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #e8e8e8;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      min-height: 44px;
+      max-height: 120px;
+      transition: border-color 0.2s;
+      direction: rtl;
+    }
+
+    #user-input:focus { border-color: #444; }
+    #user-input::placeholder { color: #444; }
+
+    #send-btn {
+      background: #2a2a4a;
+      border: 1px solid #3a3a6a;
+      color: #9090cc;
+      border-radius: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s, color 0.2s;
+      min-width: 44px;
+      height: 44px;
+    }
+
+    #send-btn:hover { background: #3a3a6a; color: #c0c0ff; }
+    #send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .model-select {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .model-btn {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      color: #666;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .model-btn.active {
+      background: #1a1a2e;
+      border-color: #3a3a6a;
+      color: #9090cc;
+    }
+
+    .model-btn:hover { border-color: #3a3a5a; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>تست Puter.js Chat</h1>
+      <span class="model-tag" id="active-model-label">claude-sonnet-4-5</span>
+    </header>
+
+    <div class="model-select">
+      <button class="model-btn active" data-model="claude-sonnet-4-5">Claude Sonnet</button>
+      <button class="model-btn" data-model="gpt-4o-mini">GPT-4o mini</button>
+      <button class="model-btn" data-model="gemini-2.5-flash-lite">Gemini Flash</button>
+    </div>
+
+    <div id="chat-box">
+      <div class="msg system">برای شروع یه چیزی بنویس — اولین پیام، پاپ‌آپ لاگین Puter رو باز می‌کنه</div>
+    </div>
+
+    <div class="input-row">
+      <textarea id="user-input" placeholder="پیامت رو بنویس..." rows="1"></textarea>
+      <button id="send-btn">↑</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const input = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const modelLabel = document.getElementById('active-model-label');
+
+    let selectedModel = 'claude-sonnet-4-5';
+    let history = [];
+    let isLoading = false;
+
+    // Model selector
+    document.querySelectorAll('.model-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedModel = btn.dataset.model;
+        modelLabel.textContent = selectedModel;
+      });
+    });
+
+    // Auto-resize textarea
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    });
+
+    // Enter to send (Shift+Enter = newline)
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        send();
+      }
+    });
+
+    sendBtn.addEventListener('click', send);
+
+    function addMsg(role, text) {
+      const div = document.createElement('div');
+      div.className = `msg ${role}`;
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return div;
+    }
+
+    async function send() {
+      const text = input.value.trim();
+      if (!text || isLoading) return;
+
+      isLoading = true;
+      sendBtn.disabled = true;
+      input.value = '';
+      input.style.height = 'auto';
+
+      addMsg('user', text);
+      history.push({ role: 'user', content: text });
+
+      const aiDiv = document.createElement('div');
+      aiDiv.className = 'msg ai streaming';
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      aiDiv.appendChild(cursor);
+      chatBox.appendChild(aiDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      let fullText = '';
+
+      try {
+        const resp = await puter.ai.chat(history, { model: selectedModel, stream: true });
+
+        for await (const part of resp) {
+          const chunk = part?.text || '';
+          fullText += chunk;
+          aiDiv.textContent = fullText;
+          aiDiv.appendChild(cursor);
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        cursor.remove();
+        aiDiv.classList.remove('streaming');
+        history.push({ role: 'assistant', content: fullText });
+
+      } catch (err) {
+        cursor.remove();
+        aiDiv.textContent = '⚠️ خطا: ' + (err.message || err);
+        aiDiv.style.color = '#ff6b6b';
+        aiDiv.classList.remove('streaming');
+      }
+
+      isLoading = false;
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  </script>
+</body>
+</html>
