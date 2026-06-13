@@ -37,9 +37,10 @@
         @keyframes loading-gradient-animation { 0% { background-position: 150% 50%; } 100% { background-position: -50% 50%; } }
         .code-block pre { user-select: text; -webkit-user-select: text; }
         #background-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
-        .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px); z-index: 2000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; transition: opacity 0.3s; }
+        .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px); z-index: 2000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; transition: opacity 0.4s ease; }
         .auth-card { background: #0f0f0f; border: 1px solid #ff8d00; border-radius: 2rem; padding: 2.5rem 2rem; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 0 40px rgba(255,141,0,0.3); }
-        .shen-brand-ltr { direction: ltr; display: inline-block; unicode-bidi: embed; }
+        /* کلاس ایزوله کردن لگو برای جلوگیری صد در صدی از به هم ریختگی */
+        .shen-brand-ltr { direction: ltr; unicode-bidi: bidi-override; display: inline-block; white-space: nowrap; }
         .connect-btn { background: linear-gradient(45deg, #ff4800, #ff8d00); color: #000; font-weight: bold; padding: 0.8rem 1.5rem; border-radius: 2rem; margin-top: 1.5rem; cursor: pointer; transition: all 0.3s; border: none; width: 100%; font-size: 1.1rem; }
         .connect-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,141,0,0.4); }
         .connect-btn:active { transform: scale(0.95); }
@@ -51,22 +52,16 @@
 <body class="pt-8 sm:pt-16">
     <canvas id="background-canvas"></canvas>
     
-    <!-- لایه احراز هویت اصلاح شده با کلیک کاربر برای جلوگیری از بلاک شدن پاپ‌آپ -->
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-card">
             <div class="text-orange-500 text-3xl mb-4 font-orbitron shen-brand-ltr font-black">☬SHΞN™</div>
-            <div class="text-sm text-gray-300 mb-2">برای ورود به لابراتوار نیاز به اتصال به هسته مرکزی دارید.</div>
-            <div id="auth-status-container" class="hidden mt-4">
-                <div class="loading-gradient-wave text-xs" id="auth-status">در حال ارتباط با سرور...</div>
-            </div>
-            <div id="auth-error-msg" class="text-red-400 text-xs mt-3 hidden"></div>
-            <button id="auth-connect-btn" class="connect-btn">اتصال و احراز هویت</button>
+            <div class="text-sm text-gray-300 mb-2">برای ورود به لابراتوار کلیک کنید.</div>
+            <button id="auth-connect-btn" class="connect-btn">ورود به لابراتوار</button>
         </div>
     </div>
 
     <div class="flex flex-col min-h-screen">
         <main class="container mx-auto px-4 w-full flex-grow">
-            <!-- صفحه اصلی -->
             <div id="initial-view" class="view max-w-3xl mx-auto">
                 <div class="text-center mb-12">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-black font-orbitron tracking-wide sm:tracking-wider">
@@ -93,7 +88,6 @@
                 </div>
             </div>
 
-            <!-- محیط چت -->
             <div id="chat-view" class="view hidden max-w-3xl mx-auto flex flex-col h-full">
                 <div id="menu-container" class="fixed top-5 right-5 z-20">
                     <button id="menu-toggle" class="w-12 h-12 rounded-full bg-gray-900/80 border border-orange-500/50 backdrop-blur-sm text-orange-400 flex items-center justify-center shadow-lg transform hover:scale-110 transition-all">
@@ -127,7 +121,6 @@
         </footer>
     </div>
 
-    <!-- قالب‌های داینامیک -->
     <template id="template-آموزش">
         <div class="space-y-6">
             <input type="text" id="topic" class="shen-input" placeholder="محتوا مثال: طراحی وب">
@@ -153,7 +146,7 @@
     </template>
 
     <script>
-        (function() {
+        document.addEventListener("DOMContentLoaded", () => {
             lucide.createIcons();
 
             const modeBtns = document.querySelectorAll('.mode-btn');
@@ -168,8 +161,6 @@
             const floatingMenu = document.getElementById('floating-menu');
             const homeBtn = document.getElementById('home-btn');
             const authOverlay = document.getElementById('auth-overlay');
-            const authStatusContainer = document.getElementById('auth-status-container');
-            const authErrorMsg = document.getElementById('auth-error-msg');
             const authConnectBtn = document.getElementById('auth-connect-btn');
 
             let currentMode = 'تشریح مشکل';
@@ -191,6 +182,20 @@
 4. اگر آموزش دادی و منتظر تایید انجام آن هستی: [CHECKBOX]
 `.trim();
 
+            // با کلیک روی ورود، پاپ‌آپ مسدود نمی‌شود چون هنوز ریکوئستی سمت هوش مصنوعی نرفته است
+            authConnectBtn.addEventListener('click', () => {
+                authConnectBtn.innerText = 'در حال ورود...';
+                setTimeout(() => {
+                    authOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        authOverlay.style.display = 'none';
+                        isChatReady = true;
+                        messages = [{ role: "system", content: SYSTEM_INSTRUCTION }];
+                        updateModeUI();
+                    }, 400);
+                }, 300);
+            });
+
             function addUserMessageToUI(text) {
                 const wrapper = document.createElement('div');
                 wrapper.className = 'flex items-start gap-3 chat-bubble user-bubble justify-end mb-6';
@@ -209,7 +214,7 @@
             async function streamPuterResponse(userPrompt, onChunk, onComplete) {
                 messages.push({ role: "user", content: userPrompt });
                 try {
-                    // اتصال ساده بدون تعیین مدل ثابت برای جلوگیری از کرش
+                    // در اینجا Puter در صورت نیاز به لاگین، به صورت قانونی پاپ‌آپ باز می‌کند
                     const response = await puter.ai.chat(messages, { stream: true });
                     let full = "";
                     for await (const part of response) {
@@ -221,7 +226,8 @@
                     onComplete(full);
                 } catch(err) {
                     console.error(err);
-                    onComplete(null, err.message || "خطا در ارتباط با سرور");
+                    messages.pop(); // حذف پیام ارسال نشده از هیستوری
+                    onComplete(null, err.message || "ارتباط با سرور برقرار نشد. لطفاً اینترنت و پاپ‌آپ مرورگر را بررسی کنید.");
                 }
             }
 
@@ -263,6 +269,7 @@
                         cursor.remove();
                         if(error) {
                             contentDiv.innerHTML = `<span class="text-red-400 font-bold">⚠️ خطا: ${error}</span>`;
+                            setupRetry(contentDiv, prompt);
                         } else {
                             contentDiv.innerHTML = formatResponse(final);
                             setupInteractiveElements(contentDiv);
@@ -272,6 +279,15 @@
                         window.scrollTo(0, document.body.scrollHeight);
                     }
                 );
+            }
+
+            function setupRetry(container, prompt) {
+                container.innerHTML += `<div class="mt-4"><button class="bg-orange-500 text-black px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors retry-msg-btn">تلاش مجدد</button></div>`;
+                container.querySelector('.retry-msg-btn').addEventListener('click', (e) => {
+                    e.target.parentElement.remove();
+                    isLoading = false;
+                    getAIResponseAndDisplay(prompt);
+                });
             }
 
             function formatResponse(text) {
@@ -323,8 +339,7 @@
                 interactiveHtml += '</div>';
 
                 let html = mainText
-                    .replace(/```(\w+)?\n([\s\S]*?)
-```/g, (m, lang, code) => {
+                    .replace(/```(\w+)?\n([\s\S]*?)```/g, (m, lang, code) => {
                         const language = lang || 'text';
                         return `
                         <div class="code-block my-5 rounded-xl bg-[#0d1117] overflow-hidden border border-gray-800 shadow-xl" dir="ltr">
@@ -455,61 +470,35 @@
                 }
             }
 
-            // لاجیک جدید اتصال متکی به کلیک کاربر
-            authConnectBtn.addEventListener('click', async () => {
-                authConnectBtn.classList.add('hidden');
-                authStatusContainer.classList.remove('hidden');
-                authErrorMsg.classList.add('hidden');
-                
-                try {
-                    // پینگ گرفتن از Puter بعد از کلیک (پاپ‌آپ توسط مرورگر مسدود نمیشه)
-                    await puter.ai.chat("ping");
-                    authOverlay.style.opacity = '0';
-                    setTimeout(() => authOverlay.style.display = 'none', 300);
-                    
-                    isChatReady = true;
-                    messages = [{ role: "system", content: SYSTEM_INSTRUCTION }];
-                    
-                    // فعال سازی UI
-                    modeBtns.forEach(btn => btn.addEventListener('click', () => { currentMode = btn.dataset.mode; updateModeUI(); }));
-                    startBtn.addEventListener('click', handleStart);
-                    
-                    menuToggle?.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        floatingMenu.classList.toggle('scale-95');
-                        floatingMenu.classList.toggle('opacity-0');
-                        floatingMenu.classList.toggle('pointer-events-none');
-                    });
-                    
-                    homeBtn?.addEventListener('click', () => {
-                        chatView.classList.add('hidden');
-                        initialView.classList.remove('hidden');
-                        chatContainer.innerHTML = '';
-                        messages = [{ role: "system", content: SYSTEM_INSTRUCTION }];
-                        isLoading = false;
-                        updateModeUI();
-                    });
-                    
-                    document.addEventListener('click', () => {
-                        if(floatingMenu && !floatingMenu.classList.contains('opacity-0')) {
-                            floatingMenu.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
-                        }
-                    });
-                    
-                    updateModeUI();
-
-                } catch(err) {
-                    console.error(err);
-                    authStatusContainer.classList.add('hidden');
-                    authErrorMsg.classList.remove('hidden');
-                    authErrorMsg.innerText = "ارتباط برقرار نشد! اتصال اینترنت و VPN خود را چک کنید.";
-                    authConnectBtn.classList.remove('hidden');
-                    authConnectBtn.innerText = "تلاش مجدد";
+            // اتصال رویدادها
+            modeBtns.forEach(btn => btn.addEventListener('click', () => { currentMode = btn.dataset.mode; updateModeUI(); }));
+            startBtn.addEventListener('click', handleStart);
+            
+            menuToggle?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                floatingMenu.classList.toggle('scale-95');
+                floatingMenu.classList.toggle('opacity-0');
+                floatingMenu.classList.toggle('pointer-events-none');
+            });
+            
+            homeBtn?.addEventListener('click', () => {
+                chatView.classList.add('hidden');
+                initialView.classList.remove('hidden');
+                chatContainer.innerHTML = '';
+                messages = [{ role: "system", content: SYSTEM_INSTRUCTION }];
+                isLoading = false;
+                updateModeUI();
+            });
+            
+            document.addEventListener('click', () => {
+                if(floatingMenu && !floatingMenu.classList.contains('opacity-0')) {
+                    floatingMenu.classList.add('scale-95', 'opacity-0', 'pointer-events-none');
                 }
             });
 
-        })();
+        }); // پایان DOMContentLoaded
 
+        // سیستم ذرات پس‌زمینه (Particles)
         (function() {
             const canvas = document.getElementById('background-canvas');
             const ctx = canvas.getContext('2d');
