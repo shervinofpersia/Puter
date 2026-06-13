@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>iNFORMA☬SHΞN™</title>
+    <title>iNFORMA ☬SHΞN™</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://js.puter.com/v2/"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,9 +38,11 @@
         .code-block pre { user-select: text; -webkit-user-select: text; }
         #background-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; }
         .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px); z-index: 2000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 1.5rem; transition: opacity 0.3s; }
-        .auth-card { background: #0f0f0f; border: 1px solid #ff8d00; border-radius: 2rem; padding: 2rem; text-align: center; max-width: 300px; width: 80%; box-shadow: 0 0 40px rgba(255,141,0,0.3); }
-        .retry-btn { background: #ff8d00; color: #000; font-weight: bold; padding: 0.5rem 1.2rem; border-radius: 2rem; margin-top: 1rem; cursor: pointer; transition: 0.2s; }
-        .retry-btn:hover { background: #ffaa33; transform: scale(1.02); }
+        .auth-card { background: #0f0f0f; border: 1px solid #ff8d00; border-radius: 2rem; padding: 2.5rem 2rem; text-align: center; max-width: 320px; width: 90%; box-shadow: 0 0 40px rgba(255,141,0,0.3); }
+        .shen-brand-ltr { direction: ltr; display: inline-block; unicode-bidi: embed; }
+        .connect-btn { background: linear-gradient(45deg, #ff4800, #ff8d00); color: #000; font-weight: bold; padding: 0.8rem 1.5rem; border-radius: 2rem; margin-top: 1.5rem; cursor: pointer; transition: all 0.3s; border: none; width: 100%; font-size: 1.1rem; }
+        .connect-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,141,0,0.4); }
+        .connect-btn:active { transform: scale(0.95); }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         .cursor { animation: blink 0.8s infinite; }
         .confirm-checkbox:checked { background-color: #ff8d00; border-color: #ff8d00; background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e"); }
@@ -49,13 +51,16 @@
 <body class="pt-8 sm:pt-16">
     <canvas id="background-canvas"></canvas>
     
+    <!-- لایه احراز هویت اصلاح شده با کلیک کاربر برای جلوگیری از بلاک شدن پاپ‌آپ -->
     <div id="auth-overlay" class="auth-overlay">
         <div class="auth-card">
-            <div class="text-orange-500 text-3xl mb-3 font-orbitron">☬SHΞN™</div>
-            <div class="text-sm text-gray-300 mb-2">در حال ارتباط با هسته مرکزی...</div>
-            <div class="loading-gradient-wave text-xs" id="auth-status">درخواست احراز هویت از Puter</div>
+            <div class="text-orange-500 text-3xl mb-4 font-orbitron shen-brand-ltr font-black">☬SHΞN™</div>
+            <div class="text-sm text-gray-300 mb-2">برای ورود به لابراتوار نیاز به اتصال به هسته مرکزی دارید.</div>
+            <div id="auth-status-container" class="hidden mt-4">
+                <div class="loading-gradient-wave text-xs" id="auth-status">در حال ارتباط با سرور...</div>
+            </div>
             <div id="auth-error-msg" class="text-red-400 text-xs mt-3 hidden"></div>
-            <button id="auth-retry-btn" class="retry-btn hidden">تلاش مجدد</button>
+            <button id="auth-connect-btn" class="connect-btn">اتصال و احراز هویت</button>
         </div>
     </div>
 
@@ -65,7 +70,8 @@
             <div id="initial-view" class="view max-w-3xl mx-auto">
                 <div class="text-center mb-12">
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-black font-orbitron tracking-wide sm:tracking-wider">
-                        <span class="gradient-black-gray">iNFORMA</span><span class="animated-gradient-text">☬SHΞN™</span>
+                        <span class="gradient-black-gray">iNFORMA</span>
+                        <span class="animated-gradient-text shen-brand-ltr">☬SHΞN™</span>
                     </h1>
                     <p class="text-sm md:text-base text-gray-300 mt-3">اولین لابراتوار دانشگاهی هسته مستقل شین</p>
                 </div>
@@ -103,13 +109,13 @@
                 
                 <div class="text-center pt-4 pb-8">
                     <h2 class="text-xl font-bold text-orange-400" id="chat-title">تشریح مشکل</h2>
-                    <p class="text-sm text-gray-400 mt-1">لابراتوار تحلیل متصل شد به ☬SHΞN™ core</p>
+                    <p class="text-sm text-gray-400 mt-1">لابراتوار تحلیل متصل شد به <span class="shen-brand-ltr">☬SHΞN™ core</span></p>
                 </div>
                 
                 <div id="chat-container" class="flex flex-col space-y-6 px-1 pb-10"></div>
                 
                 <div id="loading-indicator" class="hidden text-center py-4">
-                    <div class="loading-gradient-wave text-sm font-semibold tracking-widest">
+                    <div class="loading-gradient-wave text-sm font-semibold tracking-widest shen-brand-ltr">
                         [ ☬SHΞN™ core thinking... ]
                     </div>
                 </div>
@@ -117,20 +123,20 @@
         </main>
 
         <footer class="py-6 text-center text-sm relative z-10">
-            <p class="animated-gradient-text font-semibold">Exclusive ☬SHΞN™ made</p>
+            <p class="animated-gradient-text font-semibold">Exclusive <span class="shen-brand-ltr">☬SHΞN™</span> made</p>
         </footer>
     </div>
 
     <!-- قالب‌های داینامیک -->
     <template id="template-آموزش">
         <div class="space-y-6">
-            <input type="text" id="topic" class="shen-input" placeholder="محتوا مثال: طراحی بات تلگرامی">
+            <input type="text" id="topic" class="shen-input" placeholder="محتوا مثال: طراحی وب">
             <div class="flex items-center bg-black/20 rounded-full p-2 space-x-2 space-x-reverse">
                 <button data-value="شروع کلی" class="training-type-btn flex-1 p-3 rounded-md font-semibold text-xs sm:text-sm transition-colors active">آموزش کلی</button>
                 <button data-value="مقطعی" class="training-type-btn flex-1 p-3 rounded-md font-semibold text-xs sm:text-sm transition-colors">مبحث مشخص</button>
             </div>
             <div id="sub-topic-container" class="hidden">
-                <input type="text" id="sub-topic" class="shen-input" placeholder="کدوم بخش؟ مثلا: وب‌هوک">
+                <input type="text" id="sub-topic" class="shen-input" placeholder="کدوم بخش؟ مثلا: HTML">
             </div>
         </div>
     </template>
@@ -141,7 +147,7 @@
     
     <template id="template-تحلیل-خطا">
         <div class="space-y-6">
-            <input type="text" id="error-source" class="shen-input" placeholder="محل خطا مثال: ترمینال لینوکس">
+            <input type="text" id="error-source" class="shen-input" placeholder="محل خطا مثال: ترمینال">
             <textarea id="error-text" class="shen-input h-48" placeholder="متن کامل خطا را اینجا کپی کنید..."></textarea>
         </div>
     </template>
@@ -162,30 +168,27 @@
             const floatingMenu = document.getElementById('floating-menu');
             const homeBtn = document.getElementById('home-btn');
             const authOverlay = document.getElementById('auth-overlay');
-            const authStatus = document.getElementById('auth-status');
+            const authStatusContainer = document.getElementById('auth-status-container');
             const authErrorMsg = document.getElementById('auth-error-msg');
-            const authRetryBtn = document.getElementById('auth-retry-btn');
+            const authConnectBtn = document.getElementById('auth-connect-btn');
 
             let currentMode = 'تشریح مشکل';
             let isChatReady = false;
             let isLoading = false;
             let messages = [];
 
-            // استراتژی جدید و سخت‌گیرانه تعامل کاربر و هوش مصنوعی
-            const SYSTEM_INSTRUCTION = `تو یک مربی و دستیار هوشمند IT به نام '☬SHΞN™ learner' هستی. پردازش‌های تو در '☬SHΞN™ core' انجام می‌شود.
-- لحن تو باید حرفه‌ای، دقیق و راهگشا باشد.
-- فقط به زبان فارسی روان صحبت کن. اصطلاحات تخصصی و کدها را به انگلیسی بنویس.
-- هرگز از کاراکترهای ژاپنی، چینی یا متون نامفهوم استفاده نکن.
-- آموزش‌ها و حل مشکلات را قدم به قدم پیش ببر. به هیچ وجه پاسخ طولانی و یکجا نده.
-- به عنوان هوش مصنوعی ☬SHΞN™، نیازی به سلام و احوال‌پرسی نداری.
-- ⚠️ قانون اصلی: همیشه دقیقاً بر اساس اطلاعات کاربر پاسخ بده.
+            const SYSTEM_INSTRUCTION = `تو یک دستیار هوشمند، حرفه‌ای و هکر استایل به نام '☬SHΞN™ learner' هستی. پردازش‌های تو در '☬SHΞN™ core' انجام می‌شود.
+- لحن تو باید مستقیم، تخصصی، و بدون مقدمه و احوال‌پرسی باشد.
+- فقط به زبان فارسی روان صحبت کن. اصطلاحات تخصصی شبکه، سرور و کدنویسی را به انگلیسی بنویس.
+- هرگز از کاراکترهای ژاپنی یا چینی استفاده نکن.
+- پاسخ‌هایت را قدم‌به‌قدم بده و همه‌چیز را یکجا ننویس.
 
 ⚠️ بسیار مهم (نحوه تعامل):
 تو باید در انتهای هر پیام خود، حتماً یکی از تگ‌های زیر را برای دریافت پاسخ از کاربر قرار دهی:
-1. اگر کاربر باید متنی تایپ کند (مثل قطعه کد، توضیح یا پاسخ باز): [INPUT:راهنمای کادر متنی]
-2. اگر از کاربر سوال بله/خیر می‌پرسی: [YESNO:متن سوال]
-3. اگر چند گزینه برای انتخاب می‌دهی: [CHOICE:گزینه۱|گزینه۲|گزینه۳]
-4. اگر فقط آموزش دادی و منتظر تایید انجام آن هستی تا مرحله بعد را بگویی: [CHECKBOX]
+1. اگر نیاز به گرفتن توضیح، دستور یا کدی از سمت کاربر داری: [INPUT:راهنمای کادر متنی]
+2. اگر سوال بله/خیر می‌پرسی: [YESNO:متن سوال]
+3. اگر چند گزینه می‌دهی: [CHOICE:گزینه۱|گزینه۲|گزینه۳]
+4. اگر آموزش دادی و منتظر تایید انجام آن هستی: [CHECKBOX]
 `.trim();
 
             function addUserMessageToUI(text) {
@@ -206,7 +209,8 @@
             async function streamPuterResponse(userPrompt, onChunk, onComplete) {
                 messages.push({ role: "user", content: userPrompt });
                 try {
-                    const response = await puter.ai.chat(messages, { stream: true, model: "claude-sonnet-4-5" });
+                    // اتصال ساده بدون تعیین مدل ثابت برای جلوگیری از کرش
+                    const response = await puter.ai.chat(messages, { stream: true });
                     let full = "";
                     for await (const part of response) {
                         const chunk = part?.text || "";
@@ -230,7 +234,7 @@
                 aiDiv.className = 'flex items-start gap-3 chat-bubble ai-bubble w-full mb-8';
                 
                 const logo = document.createElement('div');
-                logo.className = 'shen-logo order-1 shadow-[0_0_15px_rgba(255,141,0,0.3)] mt-1';
+                logo.className = 'shen-logo order-1 shadow-[0_0_15px_rgba(255,141,0,0.3)] mt-1 shen-brand-ltr';
                 logo.innerHTML = '<span class="text-lg">☬</span>';
                 
                 const contentDiv = document.createElement('div');
@@ -279,13 +283,11 @@
                 const input = text.match(/\[INPUT:(.*?)\]/);
                 const checkbox = text.match(/\[CHECKBOX\]/);
 
-                // استخراج تگ‌ها از متن اصلی
                 if(yesNo) mainText = mainText.replace(yesNo[0], `<p class="mt-5 font-bold text-orange-400 text-lg border-r-4 border-orange-500 pr-3">${yesNo[1]}</p>`).trim();
                 else if(choice) mainText = mainText.replace(choice[0], '').trim();
                 else if(input) mainText = mainText.replace(input[0], '').trim();
                 else if(checkbox) mainText = mainText.replace(checkbox[0], '').trim();
 
-                // اضافه کردن کلاس interactive-active برای مدیریت غیرفعال‌سازی در آینده
                 interactiveHtml += '<div class="interactive-active mt-5">';
                 
                 if(yesNo) {
@@ -308,7 +310,6 @@
                             </label>
                         </div>`;
                 } else {
-                    // پیش‌فرض: کادر ورودی متن (جلوگیری از نمایش اشتباه چک‌باکس)
                     const placeholderText = input ? input[1] : "پاسخ یا کد خود را اینجا بنویسید...";
                     interactiveHtml += `
                         <form class="input-form flex flex-col gap-3">
@@ -321,7 +322,6 @@
                 }
                 interactiveHtml += '</div>';
 
-                // فرمت کردن کدهای Markdown
                 let html = mainText
                     .replace(/```(\w+)?\n([\s\S]*?)
 ```/g, (m, lang, code) => {
@@ -348,7 +348,6 @@
                 return html + interactiveHtml;
             }
 
-            // غیرفعال کردن فرم‌های قبلی برای جلوگیری از کلیک مجدد
             function disableAllPrevious() {
                 document.querySelectorAll('.interactive-active').forEach(el => {
                     el.classList.remove('interactive-active');
@@ -361,7 +360,6 @@
             }
 
             function setupInteractiveElements(container) {
-                // دکمه‌های کپی و دانلود
                 container.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', () => {
                     const code = btn.closest('.code-block').querySelector('code').innerText;
                     navigator.clipboard.writeText(code);
@@ -380,7 +378,6 @@
                     URL.revokeObjectURL(url);
                 }));
 
-                // گزینه‌های انتخابی (Choice و Yes/No)
                 container.querySelectorAll('.choice-btn').forEach(btn => btn.addEventListener('click', () => {
                     disableAllPrevious();
                     const ans = btn.textContent;
@@ -388,7 +385,6 @@
                     getAIResponseAndDisplay(ans);
                 }));
 
-                // فرم ورودی متن (Input)
                 const form = container.querySelector('.input-form');
                 if(form) form.addEventListener('submit', (e) => {
                     e.preventDefault();
@@ -400,7 +396,6 @@
                     }
                 });
 
-                // چک‌باکس مرحله‌ای
                 const chk = container.querySelector('.confirm-checkbox');
                 if(chk) chk.addEventListener('change', (e) => {
                     if(e.target.checked) {
@@ -439,7 +434,7 @@
                     const sub = val('sub-topic');
                     const type = document.querySelector('.training-type-btn.active')?.dataset.value || 'شروع کلی';
                     userMsg = `مبحث: ${topic}${type==='مقطعی' && sub ? ` | بخش: ${sub}` : ` | نوع: ${type}`}`;
-                    initialPrompt = `قصد آموزش مبحث '${topic}' را دارم. نوع آموزش: '${type}'.${type==='مقطعی' ? ` بخش خاص: '${sub}'` : ''} لطفاً اولین قدم را شروع کن. یادت باشد در انتهای پیامت تگ مربوطه را حتما قرار دهی.`;
+                    initialPrompt = `قصد آموزش مبحث '${topic}' را دارم. نوع آموزش: '${type}'.${type==='مقطعی' ? ` بخش خاص: '${sub}'` : ''} لطفاً اولین قدم را شروع کن. در انتهای پیامت تگ مربوطه را حتما قرار دهی.`;
                 } else if(currentMode === 'تشریح مشکل') {
                     const prob = val('problem-desc'); if(!prob) { alert('لطفاً مشکل خود را تشریح کنید.'); return; }
                     userMsg = prob;
@@ -460,38 +455,22 @@
                 }
             }
 
-            async function authenticatePuter() {
-                authStatus.innerText = "در حال اتصال به سرورهای Puter...";
+            // لاجیک جدید اتصال متکی به کلیک کاربر
+            authConnectBtn.addEventListener('click', async () => {
+                authConnectBtn.classList.add('hidden');
+                authStatusContainer.classList.remove('hidden');
                 authErrorMsg.classList.add('hidden');
-                authRetryBtn.classList.add('hidden');
+                
                 try {
-                    await puter.ai.chat([{ role: "user", content: "ping" }], { model: "claude-sonnet-4-5" });
+                    // پینگ گرفتن از Puter بعد از کلیک (پاپ‌آپ توسط مرورگر مسدود نمیشه)
+                    await puter.ai.chat("ping");
                     authOverlay.style.opacity = '0';
                     setTimeout(() => authOverlay.style.display = 'none', 300);
+                    
                     isChatReady = true;
                     messages = [{ role: "system", content: SYSTEM_INSTRUCTION }];
-                    return true;
-                } catch(err) {
-                    console.error(err);
-                    authStatus.innerText = "خطا در برقراری ارتباط";
-                    authErrorMsg.classList.remove('hidden');
-                    authErrorMsg.innerText = "ارتباط با Puter برقرار نشد. لطفاً اکانت خود را متصل کنید.";
-                    authRetryBtn.classList.remove('hidden');
-                    return false;
-                }
-            }
-
-            authRetryBtn.addEventListener('click', async () => {
-                authStatus.innerText = "تلاش مجدد...";
-                authErrorMsg.classList.add('hidden');
-                authRetryBtn.classList.add('hidden');
-                await authenticatePuter();
-            });
-
-            // شروع ارتباط
-            (async () => {
-                const ok = await authenticatePuter();
-                if(ok) {
+                    
+                    // فعال سازی UI
                     modeBtns.forEach(btn => btn.addEventListener('click', () => { currentMode = btn.dataset.mode; updateModeUI(); }));
                     startBtn.addEventListener('click', handleStart);
                     
@@ -518,11 +497,19 @@
                     });
                     
                     updateModeUI();
+
+                } catch(err) {
+                    console.error(err);
+                    authStatusContainer.classList.add('hidden');
+                    authErrorMsg.classList.remove('hidden');
+                    authErrorMsg.innerText = "ارتباط برقرار نشد! اتصال اینترنت و VPN خود را چک کنید.";
+                    authConnectBtn.classList.remove('hidden');
+                    authConnectBtn.innerText = "تلاش مجدد";
                 }
-            })();
+            });
+
         })();
 
-        // سیستم ذرات پس‌زمینه (Particles)
         (function() {
             const canvas = document.getElementById('background-canvas');
             const ctx = canvas.getContext('2d');
